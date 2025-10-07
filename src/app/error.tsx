@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import errImg from "@/assets/image/errorTextBg.jpg";
 import { ImHome } from "react-icons/im";
 import { TfiReload } from "react-icons/tfi";
 
@@ -23,7 +22,7 @@ const ErrorPage = ({ homeBtn, reloadBtn }: ErrorPageProps) => {
       <div
         className="text-[100px] md:text-[140px] font-extrabold text-transparent text-center"
         style={{
-          backgroundImage: `url(${errImg.src})`,
+          backgroundImage: `url(${``})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           WebkitBackgroundClip: "text",

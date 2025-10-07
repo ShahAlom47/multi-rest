@@ -4,12 +4,8 @@ export const dynamic = "force-dynamic";
 
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import Link from "next/link";
-import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
 import PrimaryButton from "@/components/PrimaryButton";
 import PasswordInput from "@/components/PasswordInput";
-import SocialLogin from "@/components/SocialLogin";
 
 type LoginFormInputs = {
   email: string;
@@ -17,9 +13,6 @@ type LoginFormInputs = {
 };
 
 const Login: React.FC = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectPath = searchParams.get("redirect") || "/"; // default: home
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false); // ✅ Loading state
 
@@ -40,40 +33,7 @@ const Login: React.FC = () => {
     setLoginError(null);
     setIsLoading(true); // ✅ Start loading
 
-    try {
-      const res = await signIn("credentials", {
-        redirect: false,
-        email: data.email,
-        password: data.password,
-      });
-
-      if (res?.ok) {
-        router.push(redirectPath);
-      } else {
-        const rawError = res?.error || "";
-
-        if (rawError.includes("not verified")) {
-          setLoginError(
-            "⚠ আপনার ইমেইল যাচাই করা হয়নি। / Your email is not verified. একটি verification email পাঠানো হয়েছে। / A new verification email has been sent."
-          );
-        } else if (rawError.includes("No account")) {
-          setLoginError(
-            "❌ এই ইমেইল দিয়ে কোন একাউন্ট নেই। / No account found with this email."
-          );
-        } else if (rawError.includes("Incorrect password")) {
-          setLoginError("❌ পাসওয়ার্ড ভুল হয়েছে। / Incorrect password.");
-        } else {
-          setLoginError(
-            "⚠ লগইন ব্যর্থ হয়েছে। / Login failed. Please try again."
-          );
-        }
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      setLoginError("⚠ কিছু সমস্যা হয়েছে। / Something went wrong. Try again.");
-    } finally {
-      setIsLoading(false); // ✅ Stop loading
-    }
+    console.log(data)
   };
 
   return (
@@ -122,24 +82,7 @@ const Login: React.FC = () => {
         </PrimaryButton>
       </form>
 
-      {/* Links */}
-      <div className="flex flex-col items-center gap-2 flex-wrap mt-2 ">
-        <SocialLogin />
-        <p className="text-sm text-gray-700">
-          Don’t have an account?
-          <Link
-            className="underline hover:scale-105 ml-1 text-blue-700"
-            href="/register"
-          >
-            Register
-          </Link>
-          .
-        </p>
-
-        <Link className="underline text-blue-700" href="/forget-password">
-          Lost your password?
-        </Link>
-      </div>
+    
     </div>
   );
 };

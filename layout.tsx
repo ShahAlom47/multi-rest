@@ -1,8 +1,6 @@
 
 import "./globals.css";
 import Providers from "@/Providers/RootProvider/Providers";
-// import Footer from "@/components/Footer";
-// import ConditionalWrapper from "@/components/wrappers/ConditionalWrapper";
 
 
 
