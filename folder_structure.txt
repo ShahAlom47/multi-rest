@@ -1,0 +1,80 @@
+shah-alom-official
+│
+├── package.json
+├── tsconfig.json
+├── README.md
+│
+└── src
+    │
+    ├── app
+    │   ├── globals.css
+    │   ├── layout.tsx
+    │   ├── loading.tsx
+    │   ├── not-found.tsx
+    │   ├── page.tsx
+    │   │
+    │   ├── dashboard
+    │   │   ├── page.tsx
+    │   │   └── (any other dashboard files or folders)
+    │   │
+    │   ├── (auth)
+    │   │   ├── login
+    │   │   │   └── page.tsx
+    │   │   └── register
+    │   │       └── page.tsx
+    │   │
+    │   ├── (public)
+    │   │   ├── about
+    │   │   │   └── page.tsx
+    │   │   └── portfolio
+    │   │       └── page.tsx
+    │   │
+    │   └── api
+    │       ├── auth
+    │       │   ├── [..nextauth]
+    │       │   │   └── route.ts
+    │       │   ├── authOptions
+    │       │   │   └── authOptions.ts
+    │       │   └── register
+    │       │       └── route.ts
+    │       └── user
+    │           └── route.ts
+    │
+    ├── assets
+    │   └── image
+    │       └── logo   (empty folder)
+    │
+    ├── components
+    │   ├── AuthCard.tsx
+    │   ├── AuthMenu.tsx
+    │   ├── Banner.tsx
+    │   ├── Drawer.tsx
+    │   ├── Logo.tsx
+    │   ├── MobileNavbar.tsx
+    │   ├── Navbar.tsx
+    │   ├── NavLinks.tsx
+    │   ├── PageHeading.tsx
+    │   ├── PrimaryButton.tsx
+    │   ├── PromaryButton.tsx
+    │   └── ui
+    │       └── drawer.tsx
+    │
+    ├── features   (empty folder)
+    │
+    ├── hooks
+    │   └── useScreenInfo.tsx
+    │
+    ├── layouts   (empty folder)
+    │
+    ├── Providers
+    │   └── Providers.tsx
+    │
+    ├── store   (empty folder)
+    │
+    ├── style
+    │   └── authpage.css
+    │
+    ├── types   (empty folder)
+    │
+    └── utils
+        └── handleApiError.ts
