@@ -14,6 +14,7 @@ export interface IApiResponse<T = unknown> {
 
 const api = axios.create({
   baseURL: `http://localhost:3000/api`,
+  
   withCredentials: true,
 });
 
@@ -70,3 +71,49 @@ export const request = async <T>(
     };
   }
 };
+
+
+
+// =========================
+// export const request = async <T>(
+//   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
+//   url: string,
+//   data?: Record<string, unknown> | FormData,
+//   isForm?: "formData",
+//   customHeaders?: Record<string, string>,
+//   tenantSubdomain?: string  // new parameter
+// ): Promise<IApiResponse<T>> => {
+//   try {
+//     const baseURL = tenantSubdomain
+//       ? `https://${tenantSubdomain}.tekzo.shop/api`
+//       : window.location.origin + "/api";
+
+//     const headers = {
+//       "Content-Type":
+//         isForm === "formData" ? "multipart/form-data" : "application/json",
+//       ...customHeaders,
+//     };
+
+//     const api = axios.create({ baseURL, withCredentials: true });
+
+//     // auto timestamp
+//     if (data && !(data instanceof FormData)) {
+//       const now = new Date().toISOString();
+//       if (method === "POST") data = { ...data, createdAt: now, updatedAt: now };
+//       else if (method === "PUT" || method === "PATCH") data = { ...data, updatedAt: now };
+//     }
+
+//     const response = await api({ method, url, data, headers });
+//     return response.data as IApiResponse<T>;
+
+//   } catch (error: unknown) {
+//     let message = "Unknown error occurred";
+//     if (axios.isAxiosError(error)) {
+//       const axiosError = error as AxiosError<any>;
+//       message = axiosError.response?.data?.message || axiosError.message;
+//     } else if (error instanceof Error) {
+//       message = error.message;
+//     }
+//     return { success: false, message };
+//   }
+// };

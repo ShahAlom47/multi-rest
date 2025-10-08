@@ -9,7 +9,7 @@ import { User } from "@/Interfaces/userInterfaces";
 
 export const getUserCollection = async (): Promise<Collection<User>> => {
   const client = await clientPromise;
-  const db: Db = client.db("tekzoBd-database"); // Replace with your database name
+  const db: Db = client.db("MultiRest"); // Replace with your database name
   return db.collection<User>("users");
 };
 

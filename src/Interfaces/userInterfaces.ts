@@ -1,15 +1,17 @@
+import { ObjectId } from 'mongodb';
 // types/user.ts
 
 export type UserRole = "user" | "admin" | "rider" | "super_admin";
 
 export interface User {
-  _id?: string;                     // MongoDB ObjectId
+  _id?: string |ObjectId;                     // MongoDB ObjectId
   name: string;                     // Full name
   email: string;                    // Unique email address
   passwordHash?: string;            // Encrypted password
   phone?: string;                   // Phone number
-  avatarUrl?: string;               // Profile photo
-  role: UserRole;                   // user | admin | rider | super_admin
+  image?: string| null;               // Profile photo
+  role: UserRole;   
+  verified?:boolean;                // user | admin | rider | super_admin
   tenantId?: string;                // Restaurant/shop ID (for multi-tenant)
   address?: string;                 // Full address
   city?: string;                    // City name
@@ -33,6 +35,6 @@ export interface User {
     fcmToken?: string;
     platform?: "web" | "android" | "ios";
   };
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
