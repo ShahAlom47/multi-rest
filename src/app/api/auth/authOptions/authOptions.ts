@@ -87,7 +87,7 @@ export const authOptions: NextAuthOptions = {
 
           const isPasswordValid = await bcrypt.compare(
             credentials.password,
-            superAdmin.passwordHash
+            superAdmin.password
           );
           if (!isPasswordValid) throw new Error("Incorrect password.");
 
