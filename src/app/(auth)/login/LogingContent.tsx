@@ -6,6 +6,9 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import PrimaryButton from "@/components/PrimaryButton";
 import PasswordInput from "@/components/PasswordInput";
+import { signIn } from "next-auth/react";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 type LoginFormInputs = {
   email: string;
@@ -15,6 +18,7 @@ type LoginFormInputs = {
 const Login: React.FC = () => {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false); // ✅ Loading state
+  const router = useRouter();
 
   const {
     register,
@@ -31,8 +35,41 @@ const Login: React.FC = () => {
 
   const onSubmit = async (data: LoginFormInputs) => {
     setLoginError(null);
-    setIsLoading(true); // ✅ Start loading
+    setIsLoading(true); // ✅ Start 
+    const { email, password } = data;
+  try {
+    const res = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
 
+    console.log("Login response:", res);
+
+ if (res?.ok) {
+  toast.success("Logged in successfully!");
+  router.push("/");
+} else {
+  const rawError = res?.error || "";
+
+  if (rawError.includes("EC6B0000") || rawError.includes("ssl")) {
+    toast.error("Secure connection failed. Please check your internet or try again later.");
+  } else if (rawError.includes("No account")) {
+    toast.error("No account found with this email.");
+  } else if (rawError.includes("Incorrect password")) {
+    toast.error("The password you entered is incorrect.");
+  } else {
+    toast.error("Login failed. Please try again.");
+  }
+}
+
+  } catch (error) {
+    console.error("Login error:", error);
+   
+    toast.error("Something went wrong during login. Please check your network and try again.");
+  }
+
+    setIsLoading(false); // ✅ Stop loading
     console.log(data)
   };
 

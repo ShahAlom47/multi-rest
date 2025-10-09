@@ -12,4 +12,9 @@ export const getUserCollection = async (): Promise<Collection<User>> => {
   const db: Db = client.db("MultiRest"); // Replace with your database name
   return db.collection<User>("users");
 };
+export const getTenantCollection = async (): Promise<Collection<User>> => {
+  const client = await clientPromise;
+  const db: Db = client.db("MultiRest"); // Replace with your database name
+  return db.collection<User>("tenants");
+};
 

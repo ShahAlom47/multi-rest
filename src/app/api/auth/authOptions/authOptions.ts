@@ -81,9 +81,12 @@ export const authOptions: NextAuthOptions = {
         if (!credentials.tenantKey) {
           const superAdmin = await usersCollection.findOne({
             email: credentials.email,
-            role: "super-admin",
+            role: "super_admin",
           });
           if (!superAdmin) throw new Error("Tenant is required for normal users.");
+
+          // ensure a password hash exists for the super admin account
+          if (!superAdmin.password) throw new Error("Incorrect password.");
 
           const isPasswordValid = await bcrypt.compare(
             credentials.password,
@@ -95,7 +98,7 @@ export const authOptions: NextAuthOptions = {
             id: superAdmin._id.toString(),
             name: superAdmin.name,
             email: superAdmin.email,
-            role: "super-admin",
+            role: "super_admin",
             tenantId: null,
             verified: superAdmin.verified,
             image: superAdmin.image || null,
@@ -112,9 +115,9 @@ export const authOptions: NextAuthOptions = {
         });
         if (!user) throw new Error("No account found for this email in this tenant.");
 
-        if (!user.verified) throw new Error("Email not verified.");
+        // if (!user.verified) throw new Error("Email not verified.");
 
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.passwordHash);
+        const isPasswordValid = await bcrypt.compare(credentials.password, user.password || "");
         if (!isPasswordValid) throw new Error("Incorrect password.");
 
         return {
@@ -146,12 +149,13 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       const usersCollection = await getUserCollection();
+      const tenantsCollection = await getTenantCollection();
 
       if (account?.provider === "google") {
         if (!user.email) throw new Error("Google account has no email.");
 
         // Assign default tenant if needed
-        const defaultTenant = await getTenantCollection().findOne({ slug: "default" });
+        const defaultTenant = await tenantsCollection.findOne({ slug: "default" });
         const tenantId = defaultTenant?._id.toString() ?? null;
 
         const existingUser = await usersCollection.findOne({
@@ -167,9 +171,11 @@ export const authOptions: NextAuthOptions = {
             role: "user",
             image: user.image || null,
             verified: true,
+            isVerified: true,
+            isActive: true,
             tenantId,
             createdAt: new Date().toISOString(),
-            passwordHash: "", // empty for OAuth users
+            password: "", // empty for OAuth users
           });
         }
       }
