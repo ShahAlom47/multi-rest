@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import PrimaryButton from "@/components/PrimaryButton";
 import PasswordInput from "@/components/PasswordInput";
+import { RegisterData } from "@/Interfaces/userInterfaces";
+import { registerUser } from "@/lib/allApiRequest/authRequest";
+import toast from "react-hot-toast";
 
 type RegisterFormInputs = {
   name: string;
@@ -42,7 +45,21 @@ const Register: React.FC = () => {
       setIsLoading(false);
       return;
     }
+const registerData: RegisterData = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      tenantId: "super admin", // Replace with actual tenant ID
+    };
 
+    const res = await registerUser(registerData);
+    if (!res.success) {
+      toast.error(res.message || "Registration failed");
+      setRegisterError(res.message || "Registration failed");
+      setIsLoading(false);
+      return;
+    }
+    toast.success("Registration successful! Please log in.");
     console.log("Register Data:", data);
     setIsLoading(false);
   };

@@ -16,7 +16,7 @@ export const POST = async (req: Request): Promise<NextResponse> => {
   try {
     const usersCollection = await getUserCollection();
     const body: RequestBody = await req.json();
-    const { name, email, password, role = "user", tenantId } = body;
+    const { name, email, password, tenantId } = body;
 
     // 🧩 Basic Validation
     if (!name || !email || !password) {
@@ -26,13 +26,7 @@ export const POST = async (req: Request): Promise<NextResponse> => {
       );
     }
 
-    // 🧩 Tenant rule: super_admin বাদে সবার জন্য tenantId লাগবে
-    if (role !== "super_admin" && !tenantId) {
-      return NextResponse.json(
-        { success: false, message: "Tenant ID is required for this role" },
-        { status: 400 }
-      );
-    }
+ 
 
     // 🧩 Check existing user
     const existingUser = await usersCollection.findOne({ email });
@@ -51,8 +45,8 @@ export const POST = async (req: Request): Promise<NextResponse> => {
       name,
       email,
       password: hashedPassword,
-      role,
-      tenantId: role === "super_admin" ? null : tenantId,
+      role: "user",
+      tenantId: tenantId,
       isActive: true,
       isVerified: true, // এখন Email verification দরকার নেই
       createdAt: new Date(),

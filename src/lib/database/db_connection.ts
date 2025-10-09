@@ -6,6 +6,8 @@ const uri: string = process.env.MONGODB_URI as string;
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
+console.log("MongoDB URI:", uri);
+
 if (process.env.NODE_ENV === "development") {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (!(global as any)._mongoClientPromise) {
