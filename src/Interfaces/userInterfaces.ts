@@ -1,3 +1,4 @@
+
 import { ObjectId } from 'mongodb';
 // types/user.ts
 
@@ -13,7 +14,7 @@ export interface User {
   role: UserRole;             // User role    // user | admin | rider | super_admin
   verified?:boolean;              
       emailVerificationToken?: string; // For email verification
-  tenantId?: string;                // Restaurant/shop ID (for multi-tenant)
+  tenantId?: string | null;                // Restaurant/shop ID (for multi-tenant)
   address?: string;                 // Full address
   city?: string;                    // City name
   country?: string;                 // Country name
@@ -38,4 +39,11 @@ export interface User {
   };
   createdAt?: Date | string;
   updatedAt?: Date | string;
+}
+
+export interface RegisterData {
+  name:string;
+  email:string;
+  password:string;
+  tenantId:string; // Optional (required if not super_admin)
 }

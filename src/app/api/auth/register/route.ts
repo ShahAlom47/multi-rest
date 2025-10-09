@@ -2,93 +2,61 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { getUserCollection } from "@/lib/database/db_collections";
 import { MongoServerError } from "mongodb";
-import { generateRandomToken } from "@/utils/generateRandomToken";
-import { sendEmail } from "@/utils/sendEmail";
+import { UserRole } from "@/Interfaces/userInterfaces";
 
 interface RequestBody {
+  name: string;
   email: string;
   password: string;
-  name: string;
-  photoUrl?: string | null;
+  role?: UserRole;   // Optional, default = "user"
+  tenantId?: string; // Optional (required if not super_admin)
 }
 
 export const POST = async (req: Request): Promise<NextResponse> => {
   try {
     const usersCollection = await getUserCollection();
     const body: RequestBody = await req.json();
-    const { email, password, name } = body;
+    const { name, email, password, role = "user", tenantId } = body;
 
-    // Validation
-    if (!email || !password || !name) {
+    // 🧩 Basic Validation
+    if (!name || !email || !password) {
       return NextResponse.json(
-        { message: "Email, password and name are required", success: false },
+        { success: false, message: "Name, email, and password are required" },
         { status: 400 }
       );
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    // 🧩 Tenant rule: super_admin বাদে সবার জন্য tenantId লাগবে
+    if (role !== "super_admin" && !tenantId) {
       return NextResponse.json(
-        { message: "Please provide a valid email address", success: false },
+        { success: false, message: "Tenant ID is required for this role" },
         { status: 400 }
       );
     }
 
+    // 🧩 Check existing user
     const existingUser = await usersCollection.findOne({ email });
-
     if (existingUser) {
-      if (existingUser.verified) {
-        // Already verified user → cannot register again
-        return NextResponse.json(
-          { message: "Email already exists", success: false },
-          { status: 409 }
-        );
-      } else {
-        // User exists but NOT verified → regenerate token and resend verification email
-        const emailVerificationToken = generateRandomToken(10);
-        await usersCollection.updateOne(
-          { email },
-          {
-            $set: { emailVerificationToken, updatedAt: new Date().toISOString() },
-          }
-        );
-
-        const verificationUrl = `${process.env.NEXTAUTH_URL}/verify-email?token=${emailVerificationToken}&userEmail=${email}`;
-        const htmlContent = `
-          <h3>Hello ${existingUser.name},</h3>
-          <p>You have already registered but did not verify your email. Please verify your email by clicking the link below:</p>
-          <a href="${verificationUrl}" style="display:inline-block;padding:10px 20px;background:#4caf50;color:white;text-decoration:none;border-radius:5px;">Verify Email</a>
-          <p>If you did not create an account, you can ignore this email.</p>
-        `;
-        await sendEmail(email, "Verify your email", htmlContent);
-
-        return NextResponse.json(
-          {
-            success: true,
-            message: "You have already registered. Verification email resent. Please check your inbox.",
-          },
-          { status: 200 }
-        );
-      }
+      return NextResponse.json(
+        { success: false, message: "User already exists" },
+        { status: 409 }
+      );
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    // 🧩 Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate email verification token
-    const emailVerificationToken = generateRandomToken(10);
-
-    // Save user to DB
+    // 🧩 Insert new user
     const result = await usersCollection.insertOne({
-      email,
       name,
+      email,
       password: hashedPassword,
-      role: "user",
+      role,
+      tenantId: role === "super_admin" ? null : tenantId,
       isActive: true,
-      verified: false,
-      emailVerificationToken,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      isVerified: true, // এখন Email verification দরকার নেই
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     if (!result.acknowledged) {
@@ -98,31 +66,21 @@ export const POST = async (req: Request): Promise<NextResponse> => {
       );
     }
 
-    // Send verification email
-    const verificationUrl = `${process.env.NEXTAUTH_URL}/verify-email?token=${emailVerificationToken}&userEmail=${email}`;
-    const htmlContent = `
-      <h3>Hello ${name},</h3>
-      <p>Thank you for registering. Please verify your email by clicking the link below:</p>
-      <a href="${verificationUrl}" style="display:inline-block;padding:10px 20px;background:#4caf50;color:white;text-decoration:none;border-radius:5px;">Verify Email</a>
-      <p>If you did not create an account, you can ignore this email.</p>
-    `;
-    await sendEmail(email, "Verify your email", htmlContent);
-
     return NextResponse.json(
-      { success: true, message: "User registered successfully. Please check your email to verify." },
+      { success: true, message: "User registered successfully" },
       { status: 201 }
     );
   } catch (error: unknown) {
+    console.error("Registration error:", error);
     if (error instanceof MongoServerError && error.code === 11000) {
       return NextResponse.json(
         { success: false, message: "User already exists" },
         { status: 409 }
       );
     }
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error("Registration error:", error);
+
     return NextResponse.json(
-      { success: false, message: "Internal server error", error: errorMessage },
+      { success: false, message: "Internal server error" },
       { status: 500 }
     );
   }
