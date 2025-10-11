@@ -4,31 +4,37 @@ import type { AxiosError } from "axios";
 export interface IApiResponse<T = unknown> {
   success: boolean;
   message: string;
-  insId?:string;
-  unreadCount?:number;
+  insId?: string;
+  unreadCount?: number;
   data?: T;
   totalData?: number;
   currentPage?: number;
   totalPages?: number;
 }
 
-const api = axios.create({
-  baseURL: `http://localhost:3000/api`,
-  
-  withCredentials: true,
-});
+const getBaseURL = (): string => {
+  // Example: detect tenant from window.location.host
+  if (typeof window !== "undefined") {
+    const host = window.location.host; // e.g., restu1.order.com
+    return `http://${host}/api`;
+  }
+  // Default fallback for server-side or super admin
+  return "http://localhost:3000/api";
+};
+
+
 
 export const request = async <T>(
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
   url: string,
   data?: Record<string, unknown> | FormData,
   isForm?: "formData",
-  customHeaders?: Record<string, string>
+  customHeaders?: Record<string, string>,
+  tenantBaseURL?: string // Optional override
 ): Promise<IApiResponse<T>> => {
   try {
     const headers = {
-      "Content-Type":
-        isForm === "formData" ? "multipart/form-data" : "application/json",
+      "Content-Type": isForm === "formData" ? "multipart/form-data" : "application/json",
       ...customHeaders,
     };
 
@@ -42,14 +48,16 @@ export const request = async <T>(
       }
     }
 
-    const response = await api({
+    const response = await axios({
       method,
       url,
       data,
       headers,
+      baseURL: tenantBaseURL || getBaseURL(), // dynamic tenant baseURL
+      withCredentials: true,
     });
+
     return response.data as IApiResponse<T>;
-  
   } catch (error: unknown) {
     let message = "Unknown error occurred";
     if (axios.isAxiosError(error)) {
@@ -63,7 +71,6 @@ export const request = async <T>(
     } else if (error instanceof Error) {
       message = error.message;
     }
-   
 
     return {
       success: false,
@@ -71,6 +78,7 @@ export const request = async <T>(
     };
   }
 };
+
 
 
 
