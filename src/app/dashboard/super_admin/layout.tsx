@@ -1,15 +1,15 @@
-// src/app/dashboard/rider/layout.tsx
+// src/app/dashboard/super_admin/layout.tsx
 import React from "react";
 
-export default function RiderDashboardLayout({
+export default function SuperAdminDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-orange-600 text-white p-4 font-bold">
-        Rider Dashboard
+      <header className="bg-blue-600 text-white p-4 font-bold">
+        Super Admin Dashboard Header
       </header>
       <main className="p-4">{children}</main>
     </div>

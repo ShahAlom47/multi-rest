@@ -26,8 +26,8 @@ const Login: React.FC = () => {
     formState: { errors },
   } = useForm<LoginFormInputs>({
     defaultValues: {
-      email: "",
-      password: "",
+      email: "super-admin@gmail.com",
+      password: "123456",
     },
     mode: "onBlur",
     reValidateMode: "onBlur",

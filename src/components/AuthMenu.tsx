@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { FaSpinner } from "react-icons/fa";
 import defaultUserImage from "../assets/images/defaultUserWhite.webp";
+import { UserRole } from "@/Interfaces/userInterfaces";
 
 const AuthMenu: React.FC = () => {
   const { data: sessionData, status } = useSession();
@@ -20,31 +21,31 @@ console.log(sessionData)
       </span>
     );
   }
-
-  // 🔹 যদি user না থাকে → Login icon দেখাও
-  if (!sessionData?.user ) {
-    return (
-      <Link
-        href="/login"
-        className="md:hidden flex items-center justify-center hover:scale-95"
-      >
-        Login
-      </Link>
-    );
-  }
+// 🔹 যদি user না থাকে → Login icon দেখাও
+if (!sessionData?.user) {
+  return (
+    <Link
+      href="/login"
+      className="flex items-center justify-center hover:scale-95 text-brandPrimary font-semibold"
+    >
+      Login
+    </Link>
+  );
+}
 
   // 🔹 যদি user থাকে → dropdown দেখাও
   const { name, image, role } = sessionData.user as {
     name?: string;
     image?: string;
-    role?: "super-admin" | "admin" | "user" | "rider";
+    role?: UserRole;
   };
+  console.log(name,image,role)
 
   // 🔹 Role অনুযায়ী dashboard link নির্ধারণ
   const getDashboardRoute = () => {
     switch (role) {
-      case "super-admin":
-        return "/dashboard/super-admin";
+      case "super_admin":
+        return "/dashboard/super_admin";
       case "admin":
         return "/dashboard/admin";
       case "rider":
