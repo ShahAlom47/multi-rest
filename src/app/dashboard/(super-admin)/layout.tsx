@@ -1,4 +1,4 @@
-export default function UserDashboardLayout({
+export default function SuperAdminDashboardLayout({
   children,
 }: {
   children: React.ReactNode;

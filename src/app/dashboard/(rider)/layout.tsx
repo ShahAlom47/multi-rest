@@ -1,4 +1,4 @@
-export default function UserDashboardLayout({
+export default function RiderDashboardLayout({
   children,
 }: {
   children: React.ReactNode;

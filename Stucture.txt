@@ -7,7 +7,7 @@ src/
 │   ├── register/page.tsx        # Register page
 │   └── dashboard/               # All role-based dashboards
 │       │
-│       ├── (superadmin)/        # Super Admin route group
+│       ├── (super-admin)/        # Super Admin route group
 │       │   ├── layout.tsx       # Super Admin layout (sidebar, header)
 │       │   ├── page.tsx         # Dashboard
 │       │   ├── tenants/         # Tenant management

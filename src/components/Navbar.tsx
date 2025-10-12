@@ -6,7 +6,7 @@ import Link from "next/link";
 const Navbar = () => {
   const userData = useUser();
   const user = userData?.user;
-  console.log(userData?.user)
+  console.log(userData?.user, userData)
   return (
     <nav className="bg-white shadow-md py-3 px-6 flex justify-between items-center">
       {/* Logo */}
