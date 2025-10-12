@@ -1,46 +1,43 @@
 src/
 │
 ├── app/
-│   ├── layout.tsx               # Global layout (all pages wrapper)
-│   ├── page.tsx                 # Landing / home page
-│   ├── login/page.tsx           # Login page
-│   ├── register/page.tsx        # Register page
-│   └── dashboard/               # All role-based dashboards
-│       │
-│       ├── (super-admin)/        # Super Admin route group
-│       │   ├── layout.tsx       # Super Admin layout (sidebar, header)
-│       │   ├── page.tsx         # Dashboard
-│       │   ├── tenants/         # Tenant management
-│       │   │   ├── page.tsx     # Tenants list
-│       │   │   └── add/page.tsx # Add tenant
-│       │   └── settings/page.tsx
-│       │
-│       ├── (admin)/             # Tenant Admin route group
-│       │   ├── layout.tsx       # Tenant Admin layout
-│       │   ├── page.tsx         # Dashboard
-│       │   ├── orders/          # Orders feature
-│       │   │   ├── page.tsx
-│       │   │   └── [id]/page.tsx
-│       │   ├── menu/            # Menu management
-│       │   │   └── page.tsx
-│       │   └── staff/           # Staff management
-│       │       ├── page.tsx
-│       │       └── add/page.tsx
-│       │
-│       ├── (user)/              # Tenant User / Staff route group
+│   ├── layout.tsx                   # Global layout (common header/footer, etc.)
+│   ├── page.tsx                     # Landing / home page
+│   │
+│   ├── login/
+│   │   └── page.tsx                 # Login page
+│   │
+│   ├── register/
+│   │   └── page.tsx                 # Register page
+│   │
+│   └── dashboard/                   # All role-based dashboards (protected routes)
+│       ├── admin/
 │       │   ├── layout.tsx
 │       │   ├── page.tsx
-│       │   ├── orders/page.tsx
-│       │   └── profile/page.tsx
+│       │   └── orders/
+│       │       └── page.tsx
 │       │
-│       └── (rider)/             # Rider route group
+│       ├── super-admin/
+│       │   ├── layout.tsx
+│       │   ├── page.tsx
+│       │   └── tenants/
+│       │       └── page.tsx
+│       │
+│       ├── rider/
+│       │   ├── layout.tsx
+│       │   ├── page.tsx
+│       │   └── deliveries/
+│       │       └── page.tsx
+│       │
+│       └── user/
 │           ├── layout.tsx
 │           ├── page.tsx
-│           └── orders/page.tsx
+│           └── profile/
+│               └── page.tsx
 │
-├── components/                  # Reusable UI components
-│   ├── layouts/                  # Optional base layout
-│   │   └── BaseDashboardLayout.tsx
+├── components/                      # Reusable UI components
+│   ├── layouts/
+│   │   └── BaseDashboardLayout.tsx  # Optional shared layout base
 │   ├── Sidebar.tsx
 │   ├── Header.tsx
 │   ├── Footer.tsx
@@ -49,29 +46,29 @@ src/
 │       ├── Select.tsx
 │       └── FileUpload.tsx
 │
-├── context/                     # React Context
+├── context/                         # React Context providers
 │   ├── AuthContext.tsx
 │   └── TenantContext.tsx
 │
-├── hooks/                       # Custom hooks
+├── hooks/                           # Custom reusable hooks
 │   ├── useAuth.ts
 │   ├── useTenant.ts
 │   └── useApi.ts
 │
-├── services/                    # API services
-│   ├── api.ts                    # axios wrapper (dynamic baseURL per tenant)
+├── services/                        # API calls & backend services
+│   ├── api.ts                       # axios instance with dynamic baseURL
 │   ├── tenantService.ts
 │   ├── orderService.ts
 │   └── userService.ts
 │
-├── types/                        # TypeScript interfaces
+├── types/                           # TypeScript interfaces / types
 │   ├── Tenant.ts
 │   ├── User.ts
 │   ├── Order.ts
-│   └── Response.ts               # Common API response type
+│   └── Response.ts
 │
-└── utils/                        # Utility functions
+└── utils/                           # Utility functions & constants
     ├── generateTenantId.ts
     ├── formatDate.ts
     ├── constants.ts
-    └── validate.ts               # Form or other validation functions
+    └── validate.ts

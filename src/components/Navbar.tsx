@@ -2,6 +2,7 @@
 
 import { useUser } from "@/hooks/useUser";
 import Link from "next/link";
+import AuthMenu from "./AuthMenu";
 
 const Navbar = () => {
   const userData = useUser();
@@ -24,12 +25,7 @@ const Navbar = () => {
           Home
         </Link>
 
-        <Link
-          href="/login"
-          className="text-gray-700 hover:text-blue-600 transition-colors"
-        >
-          Login
-        </Link>
+     <AuthMenu />
 
         <Link
           href="/register"
