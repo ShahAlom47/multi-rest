@@ -1,5 +1,5 @@
 // src/app/dashboard/super_admin/layout.tsx
-import DashNavbar from "@/components/DashNavbar";
+import DashNavbar from "@/components/DashboardComponets/DashNavbar";
 import DashProtectedWrapper from "@/WrapperComponets/DashProtectedWrapper";
 import React from "react";
 

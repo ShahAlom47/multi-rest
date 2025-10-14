@@ -1,4 +1,4 @@
-export interface Tenant {
+export interface TenantData {
   _id?: string;              // MongoDB ObjectId
   tenantId: string;           // Custom ID, e.g., TNT-20251011-0001
   name: string;               // Restaurant name
@@ -15,4 +15,15 @@ export interface Tenant {
   status?: "active" | "pending" | "suspended"; // Tenant lifecycle
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+
+export interface TenantFormData {
+  name: string;
+  slug: string;
+  email: string;
+  phone?: string;
+  domain: string;
+  logoUrl?: string;
+  status?: "active" | "pending" | "suspended";
 }

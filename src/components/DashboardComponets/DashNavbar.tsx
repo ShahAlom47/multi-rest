@@ -13,7 +13,9 @@ interface DashNavbarProps {
 const linksByRole: Record<string, { name: string; href: string }[]> = {
   super_admin: [
     { name: "Dashboard Home", href: "/dashboard/super_admin" },
-    { name: "Add Client", href: "/dashboard/super_admin" },
+    { name: "Tenants", href: "/dashboard/super_admin/tenants" },
+    { name: "Add Tenants", href: "/dashboard/super_admin/tenants/add" },
+    { name: "Update Tenants", href: "/dashboard/super_admin/tenants/update" },
     { name: "Manage Users", href: "/dashboard/super_admin/users" },
     { name: "Settings", href: "/dashboard/super_admin/settings" },
   ],
