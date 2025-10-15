@@ -43,3 +43,6 @@ export const getAllTenants = async (params: GetAllTenantsParams) => {
 export const createTenant = async (data: TenantFormData) => {
   return request("POST", "/tenant/add", { ...data });
 }
+export const getTenantById = async (id: string) => {
+  return request("GET", `/tenant/${id}`);
+}

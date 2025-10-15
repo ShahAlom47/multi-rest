@@ -1,5 +1,6 @@
 import { TenantData } from '@/Interfaces/tenantInterface';
 import { getAllTenants } from '@/lib/allApiRequest/tenantRequest';
+import Link from 'next/link';
 import React from 'react';
 
 const Tenants = async () => {
@@ -32,10 +33,16 @@ const Tenants = async () => {
               key={tenant._id}
               className="border rounded-xl p-4 shadow-sm bg-white hover:shadow-md transition"
             >
+              <h3 className="text-lg font-medium">{tenant.tenantId}</h3>
               <h3 className="text-lg font-medium">{tenant.name}</h3>
               <p className="text-sm text-gray-600">Email: {tenant.email}</p>
+              <p className="text-sm text-gray-600">Domain: {tenant.domain}</p>
+              <p className="text-sm text-gray-600">Slug: {tenant.slug}</p>
               <p className="text-sm text-gray-600">Status: {tenant.status}</p>
               <p className="text-sm text-gray-600">Created At: {tenant.createdAt?.toString()}</p>
+              <Link href={`/dashboard/super_admin/tenants/update/${tenant.tenantId}`} className="text-blue-500 hover:underline">
+                Update
+              </Link>
             </div>
           ))}
         </div>
