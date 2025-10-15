@@ -1,3 +1,5 @@
+export type TenantStatus = "active" | "pending" | "suspended";
+
 export interface TenantData {
   _id?: string;              // MongoDB ObjectId
   tenantId: string;           // Custom ID, e.g., TNT-20251011-0001
@@ -12,9 +14,9 @@ export interface TenantData {
     secondaryColor?: string;
     fontFamily?: string;
   };
-  status?: "active" | "pending" | "suspended"; // Tenant lifecycle
-  createdAt?: Date;
-  updatedAt?: Date;
+  status?: TenantStatus;
+  createdAt?: Date|string;
+  updatedAt?: Date|string;
 }
 
 

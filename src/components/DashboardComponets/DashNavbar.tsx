@@ -38,7 +38,7 @@ const linksByRole: Record<string, { name: string; href: string }[]> = {
 export default function DashNavbar({ role }: DashNavbarProps) {
   const pathname = usePathname();
   const { user } = useUser();
-  console.log(user);
+  // console.log(user);
 
   const links = linksByRole[role] || [];
 
