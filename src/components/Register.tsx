@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import PrimaryButton from "@/components/PrimaryButton";
 import PasswordInput from "@/components/PasswordInput";
@@ -18,6 +18,7 @@ type RegisterFormInputs = {
 const Register: React.FC = () => {
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [subdomain, setSubdomain] = useState<string>("");
 
   const {
     register,
@@ -35,21 +36,34 @@ const Register: React.FC = () => {
     reValidateMode: "onBlur",
   });
 
+  // 🔹 URL থেকে subdomain বের করা
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hostname = window.location.hostname; // example: restaurantone.example.com
+      const parts = hostname.split(".");
+      if (parts.length > 2) {
+        setSubdomain(parts[0]); // প্রথম অংশকে subdomain হিসেবে ধরা হলো
+      } else {
+        setSubdomain("default"); // default tenant
+      }
+    }
+  }, []);
+
   const onSubmit = async (data: RegisterFormInputs) => {
     setRegisterError(null);
     setIsLoading(true);
 
-    // Confirm password check
     if (data.password !== data.confirmPassword) {
       setRegisterError("Password and Confirm Password do not match");
       setIsLoading(false);
       return;
     }
-const registerData: RegisterData = {
+
+    const registerData: RegisterData = {
       name: data.name,
       email: data.email,
       password: data.password,
-      tenantId: "super admin", // Replace with actual tenant ID
+      subdomain: subdomain, // ✅ URL থেকে পাওয়া subdomain পাঠানো
     };
 
     const res = await registerUser(registerData);
@@ -59,8 +73,9 @@ const registerData: RegisterData = {
       setIsLoading(false);
       return;
     }
+
     toast.success("Registration successful! Please log in.");
-    console.log("Register Data:", data);
+    console.log("Register Data:", registerData);
     setIsLoading(false);
   };
 
@@ -105,10 +120,7 @@ const registerData: RegisterData = {
           label="Password"
           register={register("password", {
             required: "Password is required",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters",
-            },
+            minLength: { value: 6, message: "Password must be at least 6 characters" },
           })}
           error={errors.password?.message}
         />
@@ -118,10 +130,7 @@ const registerData: RegisterData = {
           label="Confirm Password"
           register={register("confirmPassword", {
             required: "Confirm Password is required",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters",
-            },
+            minLength: { value: 6, message: "Password must be at least 6 characters" },
             validate: (value) =>
               value === watch("password") || "Passwords do not match",
           })}

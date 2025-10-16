@@ -45,5 +45,5 @@ export interface RegisterData {
   name:string;
   email:string;
   password:string;
-  tenantId:string; // Optional (required if not super_admin)
+  subdomain:string; // Optional (required if not super_admin)
 }
