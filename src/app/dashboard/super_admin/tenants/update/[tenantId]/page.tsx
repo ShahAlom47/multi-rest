@@ -1,26 +1,27 @@
 "use client";
 
 import TenantForm from "@/components/DashboardComponets/TenantForm";
-import { TenantFormData } from "@/Interfaces/tenantInterface";
-import { getTenantById } from "@/lib/allApiRequest/tenantRequest";
+import { TenantData, TenantFormData } from "@/Interfaces/tenantInterface";
+import { getTenantById, updateTenantById } from "@/lib/allApiRequest/tenantRequest";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 
 const EditTenant = () => {
-
+const router = useRouter();
   const params = useParams();
   const tenantId = params.tenantId;
   console.log(tenantId);
 
-  const { data, isLoading, error } = useQuery<TenantFormData>({
+  const { data, isLoading, error } = useQuery<TenantData>({
     queryKey: ["tenant", tenantId],
     queryFn: async ({ queryKey }) => {
       // derive the id from the queryKey to ensure it's treated as a string
       const id = queryKey[1] as string;
       const res = await getTenantById(id);
-      return res?.data as TenantFormData || null;
+      return res?.data as TenantData || null;
     },
     // only run the query when tenantId is available
     enabled: !!tenantId,
@@ -35,8 +36,20 @@ console.log(data)
     }
   }, [data]);
 
-  const handleUpdateTenant = (updatedData: TenantFormData) => {
-    console.log("Update Tenant Data:", updatedData);
+  const handleUpdateTenant = async (updatedData: TenantFormData) => {
+  
+    if (!tenantId) {
+      console.error("Tenant ID is missing, cannot update tenant.");
+      return;
+    }
+    const res = await updateTenantById(data?.tenantId || '', updatedData);
+    console.log(res)
+    if (res.success) {
+      toast.success(res.message || "Tenant updated successfully");
+      router.push ('/dashboard/super_admin/tenants');
+    } else {
+      toast.error(res.message || "Failed to update tenant");
+    } 
     // TODO: Call API to update tenant
   };
 

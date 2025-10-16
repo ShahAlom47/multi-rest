@@ -46,3 +46,6 @@ export const createTenant = async (data: TenantFormData) => {
 export const getTenantById = async (id: string) => {
   return request("GET", `/tenant/singleTenant/${id}`);
 }
+export const updateTenantById = async (tenantId: string, data: TenantFormData) => {
+  return request("PATCH", `/tenant/update/${tenantId}`, { ...data });
+}
