@@ -1,24 +1,8 @@
-// userManagement.ts
+import { TenantStatus } from "./tenantInterface";
 
-import { User } from "./userInterfaces";
-
-
-
-// Admin info inside a tenant
-export interface TenantAdmin extends User {
-  permissions?: string[];
-}
-
-// Tenant info for dashboard
-export interface ISuperAdminTenantOverview {
+export interface TenantCardOverview {
   tenantId: string;
   tenantName: string;
-  tenantStatus: "active" | "suspended";
+  tenantStatus: TenantStatus;
   totalUsers: number;
-  admin: TenantAdmin ;
-  users: User[];
-  createdAt?: string;
-  lastActiveAt?: string;
 }
-
-

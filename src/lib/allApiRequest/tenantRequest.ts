@@ -30,7 +30,7 @@ export const getAllTenants = async (params: GetAllTenantsParams) => {
   if (sort) queryParams.set("sort", sort);
   if (status) queryParams.set("status", status);
 
-  const url = `/tenant/all?${queryParams.toString()}`;
+  const url = `/super-admin/tenant/all?${queryParams.toString()}`;
 
   const customHeaders: Record<string, string> | undefined = isDashboardRequest
     ? { "x-from-dashboard": "true" }
@@ -41,11 +41,11 @@ export const getAllTenants = async (params: GetAllTenantsParams) => {
 
 
 export const createTenant = async (data: TenantFormData) => {
-  return request("POST", "/tenant/add", { ...data });
+  return request("POST", "/super-admin/tenant/add", { ...data });
 }
 export const getTenantById = async (id: string) => {
-  return request("GET", `/tenant/singleTenant/${id}`);
+  return request("GET", `/super-admin/tenant/singleTenant/${id}`);
 }
 export const updateTenantById = async (tenantId: string, data: TenantFormData) => {
-  return request("PATCH", `/tenant/update/${tenantId}`, { ...data });
+  return request("PATCH", `/super-admin/tenant/update/${tenantId}`, { ...data });
 }
