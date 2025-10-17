@@ -15,6 +15,7 @@ export interface TenantData {
     fontFamily?: string;
   };
   status?: TenantStatus;
+  totalUsers?: number;        // Total users associated with the tenant
   createdAt?: Date|string;
   updatedAt?: Date|string;
 }

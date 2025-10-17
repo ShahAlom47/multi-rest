@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { getTenantCollection } from "@/lib/database/db_collections";
+import { getTenantCollection, getUserCollection } from "@/lib/database/db_collections";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
     const tenantCollection = await getTenantCollection();
+    const usersCollection = await getUserCollection();
 
     // Pagination setup
     const currentPage = parseInt(url.searchParams.get("currentPage") || "1", 10);
@@ -51,31 +52,37 @@ export async function GET(req: NextRequest) {
     }
 
     // 🔹 Fetch Tenants & total count in parallel
-    const [data, total] = await Promise.all([
+    const [tenants, total] = await Promise.all([
       tenantCollection.find(filter).sort(sortQuery).skip(skip).limit(pageSize).toArray(),
       tenantCollection.countDocuments(filter),
     ]);
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Tenants retrieved successfully",
-        data,
-        totalData: total,
-        currentPage,
-        totalPages: Math.ceil(total / pageSize),
-      },
-      { status: 200 }
+    // 🔹 Add totalUsers for each tenant
+    const tenantsWithUserCount = await Promise.all(
+      tenants.map(async (tenant) => {
+        const totalUsers = await usersCollection.countDocuments({ tenantId: tenant.tenantId });
+        return {
+          ...tenant,
+          totalUsers,
+        };
+      })
     );
+
+    return NextResponse.json({
+      success: true,
+      message: "Tenants retrieved successfully",
+      data: tenantsWithUserCount,
+      totalData: total,
+      currentPage,
+      totalPages: Math.ceil(total / pageSize),
+    }, { status: 200 });
+
   } catch (error) {
     console.error("GET /api/tenant/all Error:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to retrieve tenants",
-        error: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      success: false,
+      message: "Failed to retrieve tenants",
+      error: error instanceof Error ? error.message : String(error),
+    }, { status: 500 });
   }
 }

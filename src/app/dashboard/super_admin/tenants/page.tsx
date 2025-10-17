@@ -40,6 +40,11 @@ const Tenants = async () => {
               <p className="text-sm text-gray-600">Slug: {tenant.slug}</p>
               <p className="text-sm text-gray-600">Status: {tenant.status}</p>
               <p className="text-sm text-gray-600">Created At: {tenant.createdAt?.toString()}</p>
+              <p className="text-sm text-gray-600">Total Users: {tenant.totalUsers}</p>
+
+              <Link href={`/dashboard/super_admin/users/tenantUsers/${tenant.tenantId}`} className="text-blue-500 hover:underline">
+                View Users
+              </Link> |{' '}
               <Link href={`/dashboard/super_admin/tenants/update/${tenant.tenantId}`} className="text-blue-500 hover:underline">
                 Update
               </Link>
