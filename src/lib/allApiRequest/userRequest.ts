@@ -3,6 +3,16 @@ import { request } from "./apiRequests";
 
 
 
-export const getAllTenantUsers = async (tenantId: string | '') => {
-  return request("GET", `/super-admin/users/tenantUsers/${tenantId}`);
-}
+export const getAllTenantUsers = async (
+  tenantId: string | '',
+  { search = '', sort = '', page = 1, limit = 10 } = {}
+) => {
+  const queryParams = new URLSearchParams({
+    ...(search && { search }),
+    ...(sort && { sort }),
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+
+  return request("GET", `/super-admin/users/tenantUsers/${tenantId}?${queryParams}`);
+};

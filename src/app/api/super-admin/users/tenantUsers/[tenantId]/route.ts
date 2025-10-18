@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getUserCollection } from "@/lib/database/db_collections";
+import { getUserCollection, getTenantCollection } from "@/lib/database/db_collections";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -9,15 +9,16 @@ export async function GET(
   try {
     const { tenantId } = params;
     const url = new URL(req.url);
-    const usersCollection = await getUserCollection();
 
-    // 🔹 Ensure tenantId is provided
     if (!tenantId) {
       return NextResponse.json(
         { success: false, message: "Tenant ID is required" },
         { status: 400 }
       );
     }
+
+    const usersCollection = await getUserCollection();
+    const tenantCollection = await getTenantCollection();
 
     // 🔹 Pagination setup
     const currentPage = parseInt(url.searchParams.get("currentPage") || "1", 10);
@@ -30,13 +31,12 @@ export async function GET(
     const status = url.searchParams.get("status");
     const role = url.searchParams.get("role");
 
-    // ✅ Tenant-based base filter
-    const filter: any = { tenantId: tenantId };
+    // ✅ Tenant-based filter
+    const filter: any = { tenantId };
 
-    // 🔍 Search within this tenant only
     if (search) {
       filter.$and = [
-        { tenantId: tenantId },
+        { tenantId },
         {
           $or: [
             { name: { $regex: search, $options: "i" } },
@@ -47,17 +47,10 @@ export async function GET(
       ];
     }
 
-    // 🔎 Filter by active/suspended user
-    if (status) {
-      filter.isActive = status === "active";
-    }
+    if (status) filter.isActive = status === "active";
+    if (role) filter.role = role;
 
-    // 🔎 Filter by role
-    if (role) {
-      filter.role = role;
-    }
-
-    // 🔽 Sort setup
+    // 🔽 Sort
     const sortQuery: any = {};
     if (sort.includes("-")) {
       const [field, order] = sort.split("-");
@@ -66,13 +59,20 @@ export async function GET(
       sortQuery["createdAt"] = -1;
     }
 
-    // 🔹 Fetch users securely (exclude sensitive fields)
+    // 🔹 Exclude sensitive fields
     const projection = {
       password: 0,
       emailVerificationToken: 0,
       "deviceInfo.fcmToken": 0,
     };
 
+    // 🔹 Fetch tenant info
+    const tenantInfo = await tenantCollection.findOne(
+      { tenantId },
+      { projection: { _id: 0, tenantId: 1, name: 1, status: 1 } }
+    );
+
+    // 🔹 Fetch users
     const [users, total] = await Promise.all([
       usersCollection
         .find(filter, { projection })
@@ -80,10 +80,10 @@ export async function GET(
         .skip(skip)
         .limit(pageSize)
         .toArray(),
-      usersCollection.countDocuments(filter),
+      usersCollection.countDocuments({ tenantId }),
     ]);
 
-    // 🔹 Separate Admin info
+    // 🔹 Separate admin info
     const adminInfo = users.find((user) => user.role === "admin") || null;
     const filteredUsers = users.filter((user) => user.role !== "admin");
 
@@ -92,8 +92,14 @@ export async function GET(
         success: true,
         message: "Tenant users fetched successfully",
         data: {
+          tenantInfo: {
+            tenantId: tenantInfo?.tenantId || tenantId,
+            tenantName: tenantInfo?.name || "Unknown Tenant",
+            tenantStatus: tenantInfo?.status || "unknown",
+          },
           adminInfo,
           users: filteredUsers,
+          tenantUserCount: total,
         },
         pagination: {
           totalUsers: total,
