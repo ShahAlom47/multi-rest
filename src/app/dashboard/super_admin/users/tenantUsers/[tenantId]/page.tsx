@@ -129,7 +129,7 @@ const TenantUsers: React.FC = () => {
                   onChange={(e) =>
                     setSelectedRole(e.target.value as UserRole)
                   }
-                  className="w-full border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full my-input"
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
