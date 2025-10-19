@@ -1,4 +1,5 @@
 
+import { ObjectId } from "mongodb";
 import { request } from "./apiRequests";
 
 
@@ -16,3 +17,12 @@ export const getAllTenantUsers = async (
 
   return request("GET", `/super-admin/users/tenantUsers/${tenantId}?${queryParams}`);
 };
+
+export const changeUserRole = async (
+  userId: string | ObjectId | undefined,
+  newRole: string | undefined       
+) => {
+  return request("PATCH", `/super-admin/users/changeRole/${userId}`, {
+    role: newRole,
+  });
+}

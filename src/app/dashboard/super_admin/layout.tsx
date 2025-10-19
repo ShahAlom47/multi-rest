@@ -16,6 +16,6 @@ export default function SuperAdminDashboardLayout({
       </header>
       <main className="p-4">{children}</main>
     </div>
-    // </DashProtectedWrapper>
+    //  {/* </DashProtectedWrapper> */}
   );
 }
