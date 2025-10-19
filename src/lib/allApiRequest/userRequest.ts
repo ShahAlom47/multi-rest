@@ -22,7 +22,7 @@ export const changeUserRole = async (
   userId: string | ObjectId | undefined,
   newRole: string | undefined       
 ) => {
-  return request("PATCH", `/super-admin/users/changeRole/${userId}`, {
+  return request("PATCH", `/super-admin/users/tenantUsers/changeRole/${userId}`, {
     role: newRole,
   });
 }
