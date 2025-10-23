@@ -7,57 +7,55 @@ import { getUserCollection, getTenantCollection } from "@/lib/database/db_collec
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password)
-          throw new Error("Email and password required");
+   CredentialsProvider({
+  name: "Credentials",
+  credentials: {
+    email: { label: "Email", type: "email" },
+    password: { label: "Password", type: "password" },
+  },
+  async authorize(credentials, req) {
+    if (!credentials?.email || !credentials?.password)
+      throw new Error("Email and password required");
 
-        const usersCollection = await getUserCollection();
-        const tenantsCollection = await getTenantCollection();
+    const usersCollection = await getUserCollection();
+    const tenantsCollection = await getTenantCollection();
 
-        // 1️⃣ Find user by email
-        const user = await usersCollection.findOne({ email: credentials.email });
-        if (!user) throw new Error("No account found with this email");
+    // 🌐 বর্তমান ডোমেইন ধরো
+    const host = req?.headers?.host; // যেমন "rest1.orders.com"
+    console.log(host)
+    if (!host) throw new Error("Invalid request host");
 
-        // 2️⃣ Super Admin login (tenantId not needed)
-        if (user.role === "super_admin") {
-          const isValid = await bcrypt.compare(credentials.password, user.password || "");
-          if (!isValid) throw new Error("Incorrect password");
-          return {
-            id: user._id.toString(),
-            name: user.name,
-            email: user.email,
-            role: "super_admin",
-            tenantId: null,
-            verified: user.verified,
-            image: user.image || null,
-          };
-        }
+    // 🔍 এই ডোমেইন অনুযায়ী tenant খুঁজে বের করো
+    const tenant = await tenantsCollection.findOne({ domain: host });
+    console.log(tenant,'tenentttt')
+    if (!tenant) throw new Error("Unknown tenant");
 
-        // 3️⃣ Normal user/Admin login → validate tenant
-        if (!user.tenantId) throw new Error("Invalid tenant");
-        const tenant = await tenantsCollection.findOne({ tenantId: user.tenantId });
-        if (!tenant) throw new Error("Invalid tenant");
+    // 🧍‍♂️ user খুঁজে বের করো
+    const user = await usersCollection.findOne({ email: credentials.email });
+    if (!user) throw new Error("No account found with this email");
 
-        const isValid = await bcrypt.compare(credentials.password, user.password || "");
-        if (!isValid) throw new Error("Incorrect password");
+    // 🚫 Super admin না হলে domain mismatch check করো
+    if (user.role !== "super_admin" && user.tenantId !== tenant.tenantId) {
+      throw new Error("You are not authorized to log in from this domain");
+    }
 
-        return {
-          id: user._id.toString(),
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          image: user.image || null,
-          verified: user.verified,
-          tenantId: tenant.tenantId,
-        };
-      },
-    }),
+    // 🔑 Password check
+    const isValid = await bcrypt.compare(credentials.password, user.password || "");
+    if (!isValid) throw new Error("Incorrect password");
+
+    // ✅ সফল হলে return করো
+    return {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      tenantId: tenant.tenantId,
+      image: user.image || null,
+      verified: user.verified,
+    };
+  },
+})
+,
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
