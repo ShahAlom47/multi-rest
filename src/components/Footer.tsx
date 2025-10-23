@@ -1,17 +1,18 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import logo from "../assets/images/defaultUserWhite.webp";
 
 const Footer = () => {
 
   return (
-    <footer className="bg-color-primary dark:bg-gray-900 text-gray-100 dark:text-gray-200 mt-10 py-10">
+    <footer className="bg-gray-600 dark:bg-gray-900 text-gray-100 dark:text-gray-200 mt-10 py-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-3 gap-5 items-start  justify-betwee">
         {/* Logo Section */}
       <div className="flex flex-col space-y-3 col-span-2 md:col-span-1 row-span-1 row-start-1 mb-5">
 
           <Image
-            src={''}
+            src={logo}
             alt="devDiary Logo"
             width={50}
             height={50}
