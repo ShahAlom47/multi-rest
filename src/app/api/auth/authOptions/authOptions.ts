@@ -22,12 +22,12 @@ export const authOptions: NextAuthOptions = {
 
     // 🌐 বর্তমান ডোমেইন ধরো
     const host = req?.headers?.host; // যেমন "rest1.orders.com"
-    console.log(host)
+   
     if (!host) throw new Error("Invalid request host");
 
     // 🔍 এই ডোমেইন অনুযায়ী tenant খুঁজে বের করো
     const tenant = await tenantsCollection.findOne({ domain: host });
-    console.log(tenant,'tenentttt')
+ 
     if (!tenant) throw new Error("Unknown tenant");
 
     // 🧍‍♂️ user খুঁজে বের করো
