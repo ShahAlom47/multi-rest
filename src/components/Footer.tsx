@@ -1,13 +1,8 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { NavLink } from "./NavLink";
-import logo from "@/assets/images/devDiaryLogo.png";
-import SocialLink from "./SocialLink";
 
 const Footer = () => {
-  const pathname = usePathname();
 
   return (
     <footer className="bg-color-primary dark:bg-gray-900 text-gray-100 dark:text-gray-200 mt-10 py-10">
@@ -16,7 +11,7 @@ const Footer = () => {
       <div className="flex flex-col space-y-3 col-span-2 md:col-span-1 row-span-1 row-start-1 mb-5">
 
           <Image
-            src={logo}
+            src={''}
             alt="devDiary Logo"
             width={50}
             height={50}
@@ -35,7 +30,7 @@ const Footer = () => {
         <div className="md: cols-span-1 row-span-1 md:row-start-1 row-start-2">
           <h2 className="text-lg font-bold mb-2 ml-3 ">Links</h2>
           <nav className="  grid grid-cols-2  gap-1 w-fit   ">
-            {NavLink(pathname)}
+            <a  href="#" className="hover:underline  "> Home</a>  <a  href="/about" className="hover:underline  "> About</a>
           </nav>
         </div>
 
@@ -43,7 +38,7 @@ const Footer = () => {
         <div className=" md: cols-span-1 row-span-1 md:row-start-1 row-start-2  ml-aut">
           <h2 className="text-lg font-bold mb-2">Follow Me</h2>
           <div className="flex space-x-2  flex-col  gap-2">
-           <SocialLink></SocialLink>
+         
           </div>
         </div>
       </div>
