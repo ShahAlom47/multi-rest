@@ -5,33 +5,63 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 import { useConfirm } from "@/hooks/useConfirm";
 import CustomDrawer from "../CustomDrawer";
 
+// 🧱 Notification Interface
+export interface NotificationData {
+  _id?: string;
+  tenantId: string;
+  tenantName?: string;
+  tenantDomain?: string;
+  tenantLogo?: string;
+  title: string;
+  message: string;
+  type: "order" | "payment" | "review" | "system" | "custom";
+  priority?: "low" | "normal" | "high";
+  orderId?: string;
+  userId?: string;
+  createdBy?: string;
+  read: boolean;
+  readAt?: Date;
+  delivered: boolean;
+  deliveredAt?: Date;
+  createdAt: Date;
+  updatedAt?: Date;
+  url?: string;
+  icon?: string;
+}
+
 const AdminNotification = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const { ConfirmModal, confirm } = useConfirm();
 
-  // 🧠 Dummy notification loader (তুমি চাইলে API থেকে আনতে পারো)
+  // 🧠 Dummy data loader
   const fetchNotifications = async (pageNum = 1) => {
     setLoading(true);
     try {
-      // এখানে API কল করতে পারো — আপাতত dummy data দিচ্ছি
-      await new Promise((r) => setTimeout(r, 800));
-      const newData = Array.from({ length: 5 }, (_, i) => ({
-        id: `${pageNum}-${i}`,
+      await new Promise((r) => setTimeout(r, 1000));
+
+      const newData: NotificationData[] = Array.from({ length: 5 }, (_, i) => ({
+        _id: `${pageNum}-${i}`,
+        tenantId: "restaurant_123",
+        tenantName: "Kabab House",
+        tenantDomain: "orders.kababhouse.com",
+        tenantLogo: "https://cdn-icons-png.flaticon.com/512/3132/3132693.png",
         title: `New Order #${pageNum}-${i}`,
-        message: "A new order has been placed successfully.",
-        time: "2 min ago",
+        message: "A new order has been placed successfully!",
+        type: "order",
+        priority: "high",
         read: false,
+        delivered: true,
+        createdAt: new Date(),
+        url: `/orders/${pageNum}-${i}`,
+        icon: "🛒",
       }));
 
-      if (newData.length === 0) {
-        setHasMore(false);
-      } else {
-        setNotifications((prev) => [...prev, ...newData]);
-      }
+      if (newData.length === 0) setHasMore(false);
+      else setNotifications((prev) => [...prev, ...newData]);
     } catch (err) {
       console.error("Error fetching notifications:", err);
     } finally {
@@ -39,28 +69,59 @@ const AdminNotification = () => {
     }
   };
 
+  // Load when Drawer opens
   useEffect(() => {
     if (isOpen && notifications.length === 0) {
       fetchNotifications();
     }
   }, [isOpen]);
 
-  // 🔄 Load more notifications
+  // 🔄 Load more
   const loadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
     fetchNotifications(nextPage);
   };
 
-  // ✅ Render Notification Cards
+  // 👁️ View handler
+  const handleView = async (item: NotificationData) => {
+    await confirm({
+      title: item.title,
+      message: `${item.message}\n\nRestaurant: ${
+        item.tenantName || "N/A"
+      }\nOrder ID: ${item.orderId || "N/A"}`,
+      confirmText: "OK",
+      cancelText: "Close",
+    });
+
+    // Mark as read (demo update)
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n._id === item._id ? { ...n, read: true, readAt: new Date() } : n
+      )
+    );
+  };
+
+  // ❌ Delete handler
+  const handleDelete = async (id?: string) => {
+    const ok = await confirm({
+      title: "Delete Notification",
+      message: "Are you sure you want to delete this notification?",
+      confirmText: "Yes, Delete",
+      cancelText: "Cancel",
+    });
+    if (ok && id) {
+      setNotifications((prev) => prev.filter((n) => n._id !== id));
+    }
+  };
+
+  // 🧩 Render notifications
   const renderNotifications = () => {
     if (loading && notifications.length === 0) {
-      return (
-        <div className="text-center text-gray-400 py-4">Loading...</div>
-      );
+      return <div className="text-center text-gray-400 py-4">Loading...</div>;
     }
 
-    if (notifications.length === 0 && !loading) {
+    if (!loading && notifications.length === 0) {
       return (
         <div className="text-center text-gray-400 py-4">
           No notifications found.
@@ -70,58 +131,60 @@ const AdminNotification = () => {
 
     return notifications.map((item) => (
       <div
-        key={item.id}
+        key={item._id}
         className={`p-3 rounded-lg border shadow-sm hover:bg-gray-50 transition cursor-pointer ${
           item.read ? "bg-white" : "bg-gray-100"
         }`}
       >
-        <div className="flex justify-between items-center">
-          <h4 className="text-sm font-semibold text-gray-800">
-            {item.title}
-          </h4>
-          <span className="text-[11px] text-gray-400">{item.time}</span>
-        </div>
-        <p className="text-xs text-gray-600 mt-1">{item.message}</p>
+        <div className="flex items-start gap-3">
+          {/* ✅ Tenant Logo */}
+          {item.tenantLogo && (
+            <img
+              src={item.tenantLogo}
+              alt={item.tenantName}
+              className="h-8 w-8 rounded-full object-cover"
+            />
+          )}
 
-        <div className="flex gap-2 mt-2">
-          <button
-            onClick={() => handleView(item)}
-            className="text-xs text-brandPrimary font-medium hover:underline"
-          >
-            View Details
-          </button>
-          <button
-            onClick={() => handleDelete(item.id)}
-            className="text-xs text-red-500 hover:underline"
-          >
-            Delete
-          </button>
+          <div className="flex-1">
+            <div className="flex justify-between items-center">
+              <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-1">
+                {item.icon && <span>{item.icon}</span>}
+                {item.title}
+              </h4>
+              <span className="text-[11px] text-gray-400">
+                {new Date(item.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </div>
+
+            <p className="text-xs text-gray-600 mt-1">{item.message}</p>
+            {item.tenantName && (
+              <p className="text-[11px] text-gray-400 mt-0.5">
+                {item.tenantName}
+              </p>
+            )}
+
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={() => handleView(item)}
+                className="text-xs text-brandPrimary font-medium hover:underline"
+              >
+                View
+              </button>
+              <button
+                onClick={() => handleDelete(item._id)}
+                className="text-xs text-red-500 hover:underline"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     ));
-  };
-
-  // 👁️ View handler (তুমি চাইলে order details modal খুলতে পারো)
-  const handleView = async (item) => {
-    await confirm({
-      title: "Order Details",
-      message: `Order ID: ${item.title}\n\n${item.message}`,
-      confirmText: "OK",
-      cancelText: "Close",
-    });
-  };
-
-  // ❌ Delete handler
-  const handleDelete = async (id) => {
-    const ok = await confirm({
-      title: "Delete Notification",
-      message: "Are you sure you want to delete this notification?",
-      confirmText: "Yes, Delete",
-      cancelText: "Cancel",
-    });
-    if (ok) {
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
-    }
   };
 
   return (
@@ -140,40 +203,41 @@ const AdminNotification = () => {
       </button>
 
       {/* Drawer */}
-      <CustomDrawer
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        direction="right"
-        width="w-[90%] md:w-[40%]"
-      >
-        <div className="p-4 max-h-[97vh] flex flex-col justify-between">
-          <h3 className="text-lg font-semibold mb-2 border-b pb-2">
-            Notifications
-          </h3>
+      {isOpen && (
+        <CustomDrawer
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          direction="right"
+          width="w-[90%] md:w-[40%]"
+        >
+          <div className="p-4 max-h-[97vh] flex flex-col justify-between">
+            <h3 className="text-lg font-semibold mb-2 border-b pb-2">
+              Notifications
+            </h3>
 
-          <div className="overflow-y-scroll flex-1 space-y-2">
-            {renderNotifications()}
+            <div className="overflow-y-auto flex-1 space-y-2">
+              {renderNotifications()}
 
-            {/* 👉 See More Button */}
-            {hasMore && !loading && notifications.length > 0 && (
-              <div className="flex justify-center mt-4">
-                <button
-                  onClick={loadMore}
-                  className="text-sm text-brandPrimary hover:underline"
-                >
-                  See More
-                </button>
-              </div>
-            )}
+              {hasMore && !loading && notifications.length > 0 && (
+                <div className="flex justify-center mt-4">
+                  <button
+                    onClick={loadMore}
+                    className="text-sm text-brandPrimary hover:underline"
+                  >
+                    See More
+                  </button>
+                </div>
+              )}
 
-            {loading && notifications.length > 0 && (
-              <div className="text-center text-xs text-gray-400 mt-2">
-                Loading...
-              </div>
-            )}
+              {loading && notifications.length > 0 && (
+                <div className="text-center text-xs text-gray-400 mt-2">
+                  Loading...
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </CustomDrawer>
+        </CustomDrawer>
+      )}
 
       {ConfirmModal}
     </div>

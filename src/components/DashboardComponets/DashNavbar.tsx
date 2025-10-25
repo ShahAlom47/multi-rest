@@ -5,6 +5,7 @@ import { useUser } from "@/hooks/useUser";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+import AdminNotification from "./AdminNotification";
 
 interface DashNavbarProps {
   role: "super_admin" | "admin" | "rider" | "user";
@@ -61,6 +62,9 @@ export default function DashNavbar({ role }: DashNavbarProps) {
           })}
         </div>
         <h1 >User Email:{user?.email}</h1>
+        {/* Custom Drawer */}
+
+      <AdminNotification />
       </div>
     </nav>
   );
