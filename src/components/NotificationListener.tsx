@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { onMessage } from "firebase/messaging";
 import { messaging } from "./firebase";
 
-function NotificationListener() {
+const NotificationListener = () =>  {
   const [notification, setNotification] = useState(null);
 
   useEffect(() => {
@@ -21,3 +21,6 @@ function NotificationListener() {
     )
   );
 }
+
+
+export defult 

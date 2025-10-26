@@ -22,7 +22,7 @@
     "clsx": "^2.1.1",
     "daisyui": "^5.0.43",
     "date-fns": "^4.1.0",
-    "firebase": "^12.0.0",
+    "firebase": "^12.4.0",
     "firebase-admin": "^13.4.0",
     "framer-motion": "^12.19.2",
     "googleapis": "^159.0.0",
