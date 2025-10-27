@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { useConfirm } from "@/hooks/useConfirm";
 import CustomDrawer from "../CustomDrawer";
+import SafeImage from "../SafeImage";
+import { useFirebaseNotifications } from "@/hooks/useFirebaseNotifications";
 
 // 🧱 Notification Interface
 export interface NotificationData {
@@ -31,11 +33,19 @@ export interface NotificationData {
 
 const AdminNotification = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationData[]>([]);
+  const [notificationsData, setNotifications] = useState<NotificationData[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const { ConfirmModal, confirm } = useConfirm();
+
+
+    const {
+    notifications,
+    sendNotification,
+  } = useFirebaseNotifications();
+
+  console.log(notifications, sendNotification);
 
   // 🧠 Dummy data loader
   const fetchNotifications = async (pageNum = 1) => {
@@ -71,7 +81,7 @@ const AdminNotification = () => {
 
   // Load when Drawer opens
   useEffect(() => {
-    if (isOpen && notifications.length === 0) {
+    if (isOpen && notificationsData.length === 0) {
       fetchNotifications();
     }
   }, [isOpen]);
@@ -117,11 +127,11 @@ const AdminNotification = () => {
 
   // 🧩 Render notifications
   const renderNotifications = () => {
-    if (loading && notifications.length === 0) {
+    if (loading && notificationsData.length === 0) {
       return <div className="text-center text-gray-400 py-4">Loading...</div>;
     }
 
-    if (!loading && notifications.length === 0) {
+    if (!loading && notificationsData.length === 0) {
       return (
         <div className="text-center text-gray-400 py-4">
           No notifications found.
@@ -129,7 +139,7 @@ const AdminNotification = () => {
       );
     }
 
-    return notifications.map((item) => (
+    return notificationsData.map((item) => (
       <div
         key={item._id}
         className={`p-3 rounded-lg border shadow-sm hover:bg-gray-50 transition cursor-pointer ${
@@ -139,9 +149,9 @@ const AdminNotification = () => {
         <div className="flex items-start gap-3">
           {/* ✅ Tenant Logo */}
           {item.tenantLogo && (
-            <img
+            <SafeImage
               src={item.tenantLogo}
-              alt={item.tenantName}
+              alt={item.tenantName || "Tenant Logo"}
               className="h-8 w-8 rounded-full object-cover"
             />
           )}
@@ -195,9 +205,9 @@ const AdminNotification = () => {
         className="text-black md:text-3xl text-2xl font-light relative hover:scale-90 transition-transform"
       >
         <IoIosNotificationsOutline />
-        {notifications.length > 0 && (
+        {notificationsData.length > 0 && (
           <span className="md:h-5 md:w-5 h-4 w-4 bg-brandPrimary rounded-full absolute -top-2 -right-2 md:text-[9px] text-[8px] text-white flex items-center justify-center font-semibold shadow">
-            {notifications.length > 99 ? "99+" : notifications.length}
+            {notificationsData.length > 99 ? "99+" : notificationsData.length}
           </span>
         )}
       </button>
@@ -218,7 +228,7 @@ const AdminNotification = () => {
             <div className="overflow-y-auto flex-1 space-y-2">
               {renderNotifications()}
 
-              {hasMore && !loading && notifications.length > 0 && (
+              {hasMore && !loading && notificationsData.length > 0 && (
                 <div className="flex justify-center mt-4">
                   <button
                     onClick={loadMore}
@@ -229,7 +239,7 @@ const AdminNotification = () => {
                 </div>
               )}
 
-              {loading && notifications.length > 0 && (
+              {loading && notificationsData.length > 0 && (
                 <div className="text-center text-xs text-gray-400 mt-2">
                   Loading...
                 </div>
