@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { useConfirm } from "@/hooks/useConfirm";
 import CustomDrawer from "../CustomDrawer";
-import SafeImage from "../SafeImage";
 // import { useFirebaseNotifications } from "@/hooks/useFirebaseNotifications";
 
 // 🧱 Notification Interface
