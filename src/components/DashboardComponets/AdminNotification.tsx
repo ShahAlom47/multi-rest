@@ -5,7 +5,7 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 import { useConfirm } from "@/hooks/useConfirm";
 import CustomDrawer from "../CustomDrawer";
 import SafeImage from "../SafeImage";
-import { useFirebaseNotifications } from "@/hooks/useFirebaseNotifications";
+// import { useFirebaseNotifications } from "@/hooks/useFirebaseNotifications";
 
 // 🧱 Notification Interface
 export interface NotificationData {
@@ -40,12 +40,12 @@ const AdminNotification = () => {
   const { ConfirmModal, confirm } = useConfirm();
 
 
-    const {
-    notifications,
-    sendNotification,
-  } = useFirebaseNotifications();
+  //   const {
+  //   notifications,
+  //   sendNotification,
+  // } = useFirebaseNotifications();
 
-  console.log(notifications, sendNotification);
+  // console.log(notifications, sendNotification);
 
   // 🧠 Dummy data loader
   const fetchNotifications = async (pageNum = 1) => {
@@ -58,7 +58,7 @@ const AdminNotification = () => {
         tenantId: "restaurant_123",
         tenantName: "Kabab House",
         tenantDomain: "orders.kababhouse.com",
-        tenantLogo: "https://cdn-icons-png.flaticon.com/512/3132/3132693.png",
+        tenantLogo: "../../assets/images/defaultUserWhite.webp",
         title: `New Order #${pageNum}-${i}`,
         message: "A new order has been placed successfully!",
         type: "order",
@@ -148,14 +148,7 @@ const AdminNotification = () => {
       >
         <div className="flex items-start gap-3">
           {/* ✅ Tenant Logo */}
-          {item.tenantLogo && (
-            <SafeImage
-              src={item.tenantLogo}
-              alt={item.tenantName || "Tenant Logo"}
-              className="h-8 w-8 rounded-full object-cover"
-            />
-          )}
-
+        
           <div className="flex-1">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-1">
