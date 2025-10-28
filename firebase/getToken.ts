@@ -7,7 +7,7 @@ export const requestForToken = async () => {
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
       const token = await getToken(messaging, {
-        vapidKey: "YOUR_VAPID_KEY", // Firebase Console → Project Settings → Cloud Messaging → Web push certificates
+        vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY, // Firebase Console → Project Settings → Cloud Messaging → Web push certificates
       });
       if (token) {
         console.log("✅ Device Token:", token);
