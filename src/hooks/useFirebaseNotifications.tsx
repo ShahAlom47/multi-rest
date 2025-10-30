@@ -25,6 +25,7 @@ export const useFirebaseNotifications = () => {
 
     try {
       const supported = await isSupported();
+      console.log(supported,'sssssssssss')
       if (!supported || !messaging) {
         console.warn("🚫 Browser does not support Firebase Messaging.");
         return;
