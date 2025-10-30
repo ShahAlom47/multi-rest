@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { onMessage, getToken } from "firebase/messaging";
+import { onMessage, getToken, isSupported } from "firebase/messaging";
 import { messaging } from "../../firebase/firebaseConfig";
 
 export interface NotificationData {
@@ -21,12 +21,21 @@ export const useFirebaseNotifications = () => {
 
   // ✅ Request permission + get FCM token
   const requestPermission = useCallback(async () => {
+    if (typeof window === "undefined") return;
+
     try {
+      const supported = await isSupported();
+      if (!supported || !messaging) {
+        console.warn("🚫 Browser does not support Firebase Messaging.");
+        return;
+      }
+
       const permission = await Notification.requestPermission();
       if (permission === "granted") {
         const fcmToken = await getToken(messaging, {
           vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
         });
+
         if (fcmToken) {
           setToken(fcmToken);
           console.log("✅ FCM Token:", fcmToken);
@@ -42,32 +51,44 @@ export const useFirebaseNotifications = () => {
         console.warn("🚫 Notification permission denied");
       }
     } catch (error) {
-      console.error("🔥 Error getting permission:", error);
+      console.error("🔥 Error getting permission/token:", error);
     }
   }, []);
 
   // 🔄 Receive notifications (foreground)
   useEffect(() => {
-    const unsubscribe = onMessage(messaging, (payload) => {
-      console.log("📩 New message:", payload);
+    if (typeof window === "undefined") return;
 
-      const newNotification: NotificationData = {
-        id: payload.messageId || Date.now().toString(),
-        title: payload.notification?.title || "New Notification",
-        message: payload.notification?.body || "",
-        type: payload.data?.type,
-        read: false,
-        createdAt: new Date(),
-        icon: payload.notification?.icon || "🔔",
-      };
+    const setupListener = async () => {
+      const supported = await isSupported();
+      if (!supported || !messaging) {
+        console.warn("Browser not supported for onMessage listener.");
+        return;
+      }
 
-      setNotifications((prev) => [newNotification, ...prev]);
-    });
+      const unsubscribe = onMessage(messaging, (payload) => {
+        console.log("📩 New message:", payload);
 
-    return unsubscribe;
+        const newNotification: NotificationData = {
+          id: payload.messageId || Date.now().toString(),
+          title: payload.notification?.title || "New Notification",
+          message: payload.notification?.body || "",
+          type: payload.data?.type,
+          read: false,
+          createdAt: new Date(),
+          icon: payload.notification?.icon || "🔔",
+        };
+
+        setNotifications((prev) => [newNotification, ...prev]);
+      });
+
+      return unsubscribe;
+    };
+
+    setupListener();
   }, []);
 
-  // ✅ Send custom notification (through your backend)
+  // ✅ Send custom notification (through backend)
   const sendNotification = useCallback(
     async (title: string, message: string, type?: string) => {
       try {
@@ -75,11 +96,7 @@ export const useFirebaseNotifications = () => {
         const res = await fetch("/api/send-notification", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title,
-            message,
-            type,
-          }),
+          body: JSON.stringify({ title, message, type }),
         });
         const data = await res.json();
         console.log("📤 Notification sent:", data);
@@ -92,18 +109,6 @@ export const useFirebaseNotifications = () => {
     []
   );
 
-  // ✅ Mark notification as read
-  const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
-  };
-
-  // ✅ Delete notification
-  const deleteNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
-
   // 🚀 Initialize permission when component mounts
   useEffect(() => {
     requestPermission();
@@ -114,7 +119,5 @@ export const useFirebaseNotifications = () => {
     token,
     loading,
     sendNotification,
-    markAsRead,
-    deleteNotification,
   };
 };

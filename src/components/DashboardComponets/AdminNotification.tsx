@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { useConfirm } from "@/hooks/useConfirm";
 import CustomDrawer from "../CustomDrawer";
-// import { useFirebaseNotifications } from "@/hooks/useFirebaseNotifications";
+import { useFirebaseNotifications } from "@/hooks/useFirebaseNotifications";
 
 // 🧱 Notification Interface
 export interface NotificationData {
@@ -39,12 +39,12 @@ const AdminNotification = () => {
   const { ConfirmModal, confirm } = useConfirm();
 
 
-  //   const {
-  //   notifications,
-  //   sendNotification,
-  // } = useFirebaseNotifications();
+    const {
+    notifications,
+    sendNotification,
+  } = useFirebaseNotifications();
 
-  // console.log(notifications, sendNotification);
+  console.log(notifications, sendNotification);
 
   // 🧠 Dummy data loader
   const fetchNotifications = async (pageNum = 1) => {

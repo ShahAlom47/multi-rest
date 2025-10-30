@@ -9,6 +9,7 @@ export const requestForToken = async () => {
       const token = await getToken(messaging, {
         vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY, // Firebase Console → Project Settings → Cloud Messaging → Web push certificates
       });
+      console.log(token,'tokkkkkkkken')
       if (token) {
         console.log("✅ Device Token:", token);
         // 👉 এই টোকেনটা তোমার backend এ পাঠাও (restaurant_id সহ)
