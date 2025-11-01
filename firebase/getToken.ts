@@ -1,6 +1,7 @@
 // firebase/getToken.ts 
 import { getToken } from "firebase/messaging";
 import { messaging } from "./firebaseConfig";
+import { saveNotificationToken } from "@/lib/allApiRequest/notificationRequest";
 
 export const requestForToken = async () => {
   try {
@@ -13,11 +14,9 @@ export const requestForToken = async () => {
       if (token) {
         console.log("✅ Device Token:", token);
         // 👉 এই টোকেনটা তোমার backend এ পাঠাও (restaurant_id সহ)
-        await fetch("/api/save-token", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token }),
-        });
+        
+        const res = await saveNotificationToken(token);
+        console.log("Token saved response:", res);
       } else {
         console.log("No registration token available.");
       }
