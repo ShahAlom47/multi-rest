@@ -22,7 +22,9 @@ export interface NotificationData {
   read: boolean;                 // Whether the notification has been read
   readAt?: Date;                 // When it was read
   delivered: boolean;            // Whether it has been sent to the client device
-  deliveredAt?: Date;            // Delivery timestamp
+  deliveredAt?: Date;
+
+  token?: string;                 // Delivery timestamp
   
   // Meta info
   createdAt: Date;               // Creation time

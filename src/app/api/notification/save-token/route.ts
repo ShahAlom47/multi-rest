@@ -21,7 +21,7 @@ export const POST = async (req: Request): Promise<NextResponse> => {
     }
 
     // 🧩 Check if token already exists
-    const existingToken = await notificationCollection.findOne({ token });
+    const existingToken = await notificationCollection.findOne({ token } as any);
     if (existingToken) {
       return NextResponse.json(
         { success: true, message: "Token already exists", token },
@@ -32,9 +32,9 @@ export const POST = async (req: Request): Promise<NextResponse> => {
     // 🧩 Save new token
     const result = await notificationCollection.insertOne({
       token,
-      restaurant_id: restaurant_id || null,
+      tenantId: restaurant_id || null,
       createdAt: new Date(),
-    });
+    } as any);
 
     if (!result.acknowledged) {
       return NextResponse.json(
