@@ -15,7 +15,7 @@ export const requestForToken = async () => {
         console.log("✅ Device Token:", token);
         // 👉 এই টোকেনটা তোমার backend এ পাঠাও (restaurant_id সহ)
         
-        const res = await saveNotificationToken(token);
+        const res = await saveNotificationToken(token, "your-tenant-id-here"); // তোমার tenantId এখানে পাঠাও
         console.log("Token saved response:", res);
       } else {
         console.log("No registration token available.");
