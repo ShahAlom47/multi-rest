@@ -34,6 +34,7 @@ export const POST = async (req: Request): Promise<NextResponse> => {
       token,
       tenantId: restaurant_id || null,
       createdAt: new Date(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
     if (!result.acknowledged) {
